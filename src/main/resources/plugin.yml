@@ -1,0 +1,5 @@
+name: RecursiveShulker
+main: net.pvpin.recursiveshulker.Main
+version: 1.0-SNAPSHOT
+author: William_Shi
+api-version: 1.13
