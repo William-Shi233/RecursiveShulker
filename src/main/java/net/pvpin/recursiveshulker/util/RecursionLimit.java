@@ -38,7 +38,7 @@ public class RecursionLimit {
         }
     }
 
-    private static boolean isShulkerBox(ItemStack stack) {
+    public static boolean isShulkerBox(ItemStack stack) {
         if (stack == null) {
             return false;
         }
@@ -72,7 +72,7 @@ public class RecursionLimit {
                             )
                     )
             ), new NBTReadLimiter(1048576)); // Max: 2097152
-        }catch (RuntimeException exception){
+        } catch (RuntimeException exception) {
             result = false; // Too long
         } catch (IOException exception) {
             exception.printStackTrace();
@@ -80,7 +80,7 @@ public class RecursionLimit {
         return result;
     }
 
-    private static int getDepth(NBTBase base) {
+    public static int getDepth(NBTBase base) {
         AtomicInteger depth = new AtomicInteger(0);
         if (base instanceof NBTList) {
             ((NBTList<NBTBase>) base)
@@ -101,5 +101,34 @@ public class RecursionLimit {
                     });
         }
         return 1 + depth.get();
+    }
+
+    public static long getLength(NBTBase base) {
+        try {
+            var bytes = new ByteArrayOutputStream();
+            var outputStream = new DataOutputStream(
+                    new BufferedOutputStream(
+                            new GZIPOutputStream(bytes)
+                    )
+            );
+            NBTCompressedStreamTools.write(base, outputStream);
+            outputStream.flush();
+            outputStream.close();
+            var limiter = new NBTReadLimiter(Long.MAX_VALUE);
+            NBTCompressedStreamTools.loadCompound(new DataInputStream(
+                    new GZIPInputStream(
+                            new BufferedInputStream(
+                                    new ByteArrayInputStream(bytes.toByteArray())
+                            )
+                    )
+            ), limiter);
+            var field = NBTReadLimiter.class.getDeclaredField("reade");
+            field.setAccessible(true);
+            var length = (long) field.get(limiter);
+            return length;
+        } catch (IOException | NoSuchFieldException | IllegalAccessException ex) {
+            ex.printStackTrace();
+        }
+        return 0L;
     }
 }

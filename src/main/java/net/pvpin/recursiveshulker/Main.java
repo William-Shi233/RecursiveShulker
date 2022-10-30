@@ -3,6 +3,7 @@ package net.pvpin.recursiveshulker;
 import com.cryptomorin.xseries.XMaterial;
 import net.pvpin.recursiveshulker.gui.CloseListener;
 import net.pvpin.recursiveshulker.gui.OpenListener;
+import net.pvpin.recursiveshulker.gui.SortCommand;
 import net.pvpin.recursiveshulker.gui.TransactionListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -28,5 +29,8 @@ public class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new OpenListener(), this);
         Bukkit.getPluginManager().registerEvents(new CloseListener(), this);
         Bukkit.getPluginManager().registerEvents(new TransactionListener(), this);
+        var cmd = new SortCommand();
+        Bukkit.getPluginCommand("sortshulker").setExecutor(cmd);
+        Bukkit.getPluginCommand("sortshulker").setTabCompleter(cmd);
     }
 }
